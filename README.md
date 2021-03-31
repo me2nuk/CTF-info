@@ -1,2 +1,4 @@
-# ctftime-discord
-ctftime discord bot
+# CTF-info
+
+
+this is discord bot
