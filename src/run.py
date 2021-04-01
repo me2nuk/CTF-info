@@ -55,7 +55,24 @@ async def week_info(ctx):
     embed = discord.Embed(title='CTFtime week',description='현재 날짜의 일주일 전, 후에 개최되는 대회의 상세한 정보를 나열합니다.', color = config_color)
 
     for i in range(0,len(result['items'])):
-        print(result['items'][i])
+        embed.add_field(name=f"{i+1}. {result['items'][i]['summary']}",value=result['items'][i]['description'], inline=False)
+
+    await ctx.send(embed=embed)
+
+@app.command()
+async def Td(ctx):
+
+    week_ago = (datetime.today()).strftime("%Y-%m-%dT00:00:00Z")
+    week_later = (datetime.today()).strftime("%Y-%m-%dT23:59:59Z")
+
+    r = calendar(MINTime=week_ago, MAXTime=week_later)
+    result = r.urlopen()
+
+    items = []
+
+    embed = discord.Embed(title='CTFtime week',description='현재 날짜의 일주일 전, 후에 개최되는 대회의 상세한 정보를 나열합니다.', color = config_color)
+
+    for i in range(0,len(result['items'])):
         embed.add_field(name=f"{i+1}. {result['items'][i]['summary']}",value=result['items'][i]['description'], inline=False)
 
     await ctx.send(embed=embed)
