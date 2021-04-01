@@ -20,7 +20,8 @@ async def info(ctx):
     embed.add_field(name='!CTF week',value='현재 날짜의 일주일 전, 후에 개최되는 대회명을 나열합니다.', inline=False)
     embed.add_field(name='!CTF week_info',value='현재 날짜의 일주일 전, 후에 개최되는 대회의 상세한 정보를 나열합니다.', inline=False)
     embed.add_field(name='!CTF Td',value='오늘 진행중인 CTF의 상세한 정보를 나열합니다.', inline=False)
-    embed.add_field(name='!CTF se <CTF name>',value='해당 <CTF name>의 정보를 나열합니다.', inline=False)
+    embed.add_field(name='!CTF q <CTF name>',value='해당 <CTF name>의 정보를 나열합니다.', inline=False)
+    embed.add_field(name='!CTF q_info <CTF name>',value='해당 <CTF name>의 상세한 정보를 나열합니다.', inline=False)
     embed.set_image(url='https://i.imgur.com/Cv39KTq.png')
 
     await ctx.send(embed=embed)
@@ -39,7 +40,7 @@ async def week(ctx):
     for i in range(0,len(result['items'])):
         items.append(result['items'][i]['summary'])
 
-    embed = discord.Embed(title='CTFtime week',description='현재 날짜의 일주일 전, 후에 개최되는 대회명을 나열합니다.', color = config_color)
+    embed = discord.Embed(title='!CTF week',description='현재 날짜의 일주일 전, 후에 개최되는 대회명을 나열합니다.', color = config_color)
     embed.set_footer(text=('\n'+'\n'.join(items)))
 
     await ctx.send(embed=embed)
@@ -52,7 +53,7 @@ async def week_info(ctx):
     r = calendar(MINTime=week_ago, MAXTime=week_later)
     result = r.urlopen()
 
-    embed = discord.Embed(title='CTFtime week',description='현재 날짜의 일주일 전, 후에 개최되는 대회의 상세한 정보를 나열합니다.', color = config_color)
+    embed = discord.Embed(title='!CTF week_info',description='현재 날짜의 일주일 전, 후에 개최되는 대회의 상세한 정보를 나열합니다.', color = config_color)
 
     for i in range(0,len(result['items'])):
         embed.add_field(name=f"{i+1}. {result['items'][i]['summary']}",value=result['items'][i]['description'], inline=False)
@@ -68,11 +69,93 @@ async def Td(ctx):
     r = calendar(MINTime=week_ago, MAXTime=week_later)
     result = r.urlopen()
 
+    print(result['items'])
+
     items = []
 
-    embed = discord.Embed(title='CTFtime week',description='현재 날짜의 일주일 전, 후에 개최되는 대회의 상세한 정보를 나열합니다.', color = config_color)
+    embed = discord.Embed(title='!CTF Td',description='오늘 진행중인 CTF의 상세한 정보를 나열합니다.', color = config_color)
 
     for i in range(0,len(result['items'])):
-        embed.add_field(name=f"{i+1}. {result['items'][i]['summary']}",value=result['items'][i]['description'], inline=False)
+        
+        items.append(
+            {
+                'summary':result['items'][i]['summary'], 
+                'description':result['items'][i]['description']
+            }
+        )
+        
+    count = 0
+
+    if items:
+        for i in items:
+            if i.get('description'):
+                count += 1
+                embed.add_field(name=f"{count}. {i['summary']}",value=i['description'], inline=False)
+    if count == 0:
+        embed.set_footer(text='해당 정보를 찾지 못했습니다.')
+    else:
+        embed.set_footer(text='해당 정보를 찾지 못했습니다.')
+
+    await ctx.send(embed=embed)
+
+@app.command()
+async def q(ctx, text):
+
+    Search = text
+    embed = discord.Embed(title='CTFtime q', description='해당 {}의 정보를 나열합니다.'.format(Search), color = config_color)
+
+    items = []
+
+    r = calendar_Queries(Search=Search)
+    result = r.urlopen()
+
+    for i in range(0, len(result['items'])):
+        items.append(result['items'][i]['summary'])
+
+    if items:
+        embed.set_footer(text=('\n'+'\n'.join(items)))
+
+    else:
+        embed.set_footer(text=('\n'+'\n'.join(items)))
+
+    await ctx.send(embed=embed)
+
+@app.command()
+async def q_info(ctx, text):
+
+    Search = text
+    r = calendar_Queries(Search=Search)
+    result = r.urlopen()
+
+    embed = discord.Embed(title='!CTF q_info',description=f'해당 {Search} 의 정보를 나열합니다.', color = config_color)
+
+    items = []
+
+    for i in range(0,len(result['items'])):
+        if result['items'][i].get('description'):    
+            items.append(
+                {
+                    'summary':result['items'][i]['summary'], 
+                    'description':result['items'][i]['description']
+                }
+            )
+
+    count = 0
+
+    if items:
+
+        for i in items:
+            print(i)
+            if i.get('description'):
+                count += 1
+                embed.add_field(name=f"{count}. {i['summary']}",value=i['description'], inline=False)
+
+    if count == 0:
+
+        embed.set_footer(text='해당 정보를 찾지 못했습니다.')
+
+    else:
+
+        embed.set_footer(text='해당 정보를 찾지 못했습니다.')
 
     await ctx.send(embed=embed)
