@@ -22,6 +22,7 @@ async def info(ctx):
     embed.add_field(name='!CTF Td',value='오늘 진행중인 CTF의 상세한 정보를 나열합니다.', inline=False)
     embed.add_field(name='!CTF q <CTF name>',value='해당 <CTF name>의 정보를 나열합니다.', inline=False)
     embed.add_field(name='!CTF q_info <CTF name>',value='해당 <CTF name>의 상세한 정보를 나열합니다.', inline=False)
+    embed.set_footer(text='초대 링크 : https://discord.com/api/oauth2/authorize?client_id=825034113413152818&permissions=0&scope=bot')
     embed.set_image(url='https://i.imgur.com/Cv39KTq.png')
 
     await ctx.send(embed=embed)
@@ -99,10 +100,13 @@ async def Td(ctx):
     await ctx.send(embed=embed)
 
 @app.command()
-async def q(ctx, text):
+async def q(ctx, *text):
 
-    Search = text
-    embed = discord.Embed(title='CTFtime q', description='해당 {}의 정보를 나열합니다.'.format(Search), color = config_color)
+    Search = '%20'.join([i for i in text])
+
+    info = ' '.join([i for i in text])
+
+    embed = discord.Embed(title='CTFtime q', description='해당 {}의 정보를 나열합니다.'.format(info), color = config_color)
 
     items = []
 
@@ -121,13 +125,15 @@ async def q(ctx, text):
     await ctx.send(embed=embed)
 
 @app.command()
-async def q_info(ctx, text):
+async def q_info(ctx, *text):
 
-    Search = text
+    Search = '%20'.join([i for i in text])
     r = calendar_Queries(Search=Search)
     result = r.urlopen()
 
-    embed = discord.Embed(title='!CTF q_info',description=f'해당 {Search} 의 정보를 나열합니다.', color = config_color)
+    info = ' '.join([i for i in text])
+
+    embed = discord.Embed(title='!CTF q_info',description=f'해당 {info} 의 정보를 나열합니다.', color = config_color)
 
     items = []
 
@@ -145,12 +151,11 @@ async def q_info(ctx, text):
     if items:
 
         for i in items:
-            print(i)
             if i.get('description'):
                 count += 1
                 embed.add_field(name=f"{count}. {i['summary']}",value=i['description'], inline=False)
 
-    if count == 0:
+    elif count == 0:
 
         embed.set_footer(text='해당 정보를 찾지 못했습니다.')
 
