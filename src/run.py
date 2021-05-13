@@ -57,6 +57,7 @@ async def week_info(ctx):
     embed = discord.Embed(title='!CTF week_info',description='현재 날짜의 일주일 전, 후에 개최되는 대회의 상세한 정보를 나열합니다.', color = config_color)
 
     for i in range(0,len(result['items'])):
+        print(result)
         embed.add_field(name=f"{i+1}. {result['items'][i]['summary']}",value=result['items'][i]['description'], inline=False)
 
     await ctx.send(embed=embed)
